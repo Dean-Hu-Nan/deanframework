@@ -1,9 +1,11 @@
 package com.dean4j.framework.helper;
 
 import com.dean4j.framework.annotation.Aspect;
+import com.dean4j.framework.annotation.Service;
 import com.dean4j.framework.proxy.AspectProxy;
 import com.dean4j.framework.proxy.Proxy;
 import com.dean4j.framework.proxy.ProxyManager;
+import com.dean4j.framework.proxy.TransacationProxy;
 import com.dean4j.framework.uitl.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,7 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 /**
- * 方法拦截助手类
+ * 方法拦截帮助类
  *
  * @author hunan
  * @since 1.0.0
@@ -43,6 +45,15 @@ public final class AopHelper {
      */
     private static Map<Class<?>, Set<Class<?>>> createProxyMap() throws Exception {
         Map<Class<?>, Set<Class<?>>> proxyMap = new HashMap<Class<?>, Set<Class<?>>>();
+        addAspectProxy(proxyMap);
+        addTransacationProxy(proxyMap);
+        return proxyMap;
+    }
+
+    /**
+     * 添加自定义切面
+     */
+    private static void addAspectProxy(Map<Class<?>, Set<Class<?>>> proxyMap) throws Exception {
         /**
          * 根据模板类获取继承了代理模板类的所有子类，就是开发中的切面类
          */
@@ -58,7 +69,17 @@ public final class AopHelper {
                 proxyMap.put(proxyClass, targetClassSet);
             }
         }
-        return proxyMap;
+    }
+
+    /**
+     * 用事物控制代理类代理所有的Service类
+     */
+    private static void addTransacationProxy(Map<Class<?>, Set<Class<?>>> proxyMap) throws Exception {
+        /**
+         * 获取所有的Service类
+         */
+        Set<Class<?>> proxyClassSet = ClassHelper.getClassSetByAnnotion(Service.class);
+        proxyMap.put(TransacationProxy.class, proxyClassSet);
     }
 
     /**
