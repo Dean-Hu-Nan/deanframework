@@ -22,8 +22,13 @@ public class ControllerTimeAspect extends AspectProxy {
     private Long begin;
 
     @Override
-    public void before(Class<?> cls, Method method, Object[] params) throws Throwable {
+    public void begin() {
         LOGGER.debug("-----------执行方法开始--------------");
+    }
+
+    @Override
+    public void before(Class<?> cls, Method method, Object[] params) throws Throwable {
+
         LOGGER.debug("类名：" + cls.getName());
         LOGGER.debug("方法名：" + method.getName());
         begin = System.currentTimeMillis();
@@ -32,6 +37,19 @@ public class ControllerTimeAspect extends AspectProxy {
     @Override
     public void after(Class<?> cls, Method method, Object[] params, Object result) throws Throwable {
         LOGGER.debug(String.format("执行时间: %dms", System.currentTimeMillis() - begin));
+    }
+
+    @Override
+    public void end() {
         LOGGER.debug("-----------执行方法结束--------------");
+    }
+
+    /**
+     * 筛选需要被代理的方法
+     * @return true: 被代理  false：跳过代理
+     */
+    @Override
+    public boolean intercept(Class<?> cls, Method method, Object[] params) throws Throwable {
+        return super.intercept(cls, method, params);
     }
 }
