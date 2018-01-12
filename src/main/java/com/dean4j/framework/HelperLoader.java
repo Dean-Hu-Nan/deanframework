@@ -1,9 +1,6 @@
 package com.dean4j.framework;
 
-import com.dean4j.framework.helper.BeanHelper;
-import com.dean4j.framework.helper.ClassHelper;
-import com.dean4j.framework.helper.ControllerHelper;
-import com.dean4j.framework.helper.IocHelper;
+import com.dean4j.framework.helper.*;
 import com.dean4j.framework.uitl.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,7 @@ public final class HelperLoader {
         Class<?>[] classList = {
                 ClassHelper.class,
                 BeanHelper.class,
+                AopHelper.class,
                 IocHelper.class,
                 ControllerHelper.class
         };
