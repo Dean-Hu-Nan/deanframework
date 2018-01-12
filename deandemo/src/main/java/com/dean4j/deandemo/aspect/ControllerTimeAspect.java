@@ -23,7 +23,7 @@ public class ControllerTimeAspect extends AspectProxy {
 
     @Override
     public void before(Class<?> cls, Method method, Object[] params) throws Throwable {
-        LOGGER.debug("-----------方法开始--------------");
+        LOGGER.debug("-----------执行方法开始--------------");
         LOGGER.debug("类名：" + cls.getName());
         LOGGER.debug("方法名：" + method.getName());
         begin = System.currentTimeMillis();
@@ -32,6 +32,6 @@ public class ControllerTimeAspect extends AspectProxy {
     @Override
     public void after(Class<?> cls, Method method, Object[] params, Object result) throws Throwable {
         LOGGER.debug(String.format("执行时间: %dms", System.currentTimeMillis() - begin));
-        LOGGER.debug("-----------方法结束--------------");
+        LOGGER.debug("-----------执行方法结束--------------");
     }
 }
