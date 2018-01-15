@@ -1,5 +1,7 @@
 package com.dean4j.deandemo.service;
 
+import com.dean4j.framework.bean.Param;
+
 /**
  * Service 接口 的演示
  *
@@ -8,4 +10,5 @@ package com.dean4j.deandemo.service;
  */
 public interface FirstDemoService {
     String getTime();
+    Boolean uploadFiles(Param param);
 }

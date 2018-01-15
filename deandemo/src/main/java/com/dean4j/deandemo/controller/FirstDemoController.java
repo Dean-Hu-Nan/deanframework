@@ -8,6 +8,7 @@ import com.dean4j.framework.annotation.Inject;
 import com.dean4j.framework.bean.Data;
 import com.dean4j.framework.bean.Param;
 import com.dean4j.framework.bean.View;
+import com.dean4j.framework.uitl.CastUtil;
 
 /**
  * 控制器的演示
@@ -22,19 +23,30 @@ public class FirstDemoController {
     private FirstDemoService firstDemoService;
 
     /**
-     * 返回页面
+     * 返回页面，不带参数
      */
     @Action("get:/hello")
-    public View hello(Param param) {
+    public View hello() {
         String current = firstDemoService.getTime();
         return new View("hello.jsp").addModel("current", current);
     }
 
     /**
-     * 返回Json数据
+     * 返回Json数据，带参数
      */
     @Action("get:/data")
     public Data data(Param param) {
-        return new Data(new DataDemo(1, "Dean"));
+        return new Data(new DataDemo(CastUtil.castInt(param.getFileMap().get("id")), "Dean"));
     }
+
+
+    /**
+     * 演示附件上传
+     */
+    @Action("post:/upload")
+    public View upload(Param param) {
+        boolean isSuccess = firstDemoService.uploadFiles(param);
+        return new View("hello.jsp").addModel("isSuccess", isSuccess);
+    }
+
 }

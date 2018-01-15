@@ -2,6 +2,8 @@ package com.dean4j.deandemo.service.impl;
 
 import com.dean4j.deandemo.service.FirstDemoService;
 import com.dean4j.framework.annotation.Service;
+import com.dean4j.framework.bean.Param;
+import com.dean4j.framework.helper.UploadHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,5 +26,11 @@ public class FirstDemoServiceImpl implements FirstDemoService {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String current = dateFormat.format(new Date());
         return current;
+    }
+
+    @Override
+    public Boolean uploadFiles(Param param) {
+        UploadHelper.uploadFile("/tem/upload", param.getFile("demo_file"));
+        return true;
     }
 }
