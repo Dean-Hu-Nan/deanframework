@@ -1,6 +1,7 @@
 package com.dean4j.framework.helper;
 
 import com.dean4j.framework.ConfigConstant;
+import com.dean4j.framework.uitl.CastUtil;
 import com.dean4j.framework.uitl.PropsUtil;
 
 import java.util.Properties;
@@ -68,5 +69,13 @@ public final class ConfigHelper {
      */
     public static String getAppAssetPath() {
         return CONFIG_PROPS.getProperty(ConfigConstant.APP_ASSET_PATH);
+    }
+
+    /**
+     * 获取应用的 上传文件的大小限制
+     * @return
+     */
+    public static int getAppUploadLimit() {
+        return CastUtil.castInt(CONFIG_PROPS.getProperty(ConfigConstant.APP_UPLOAD_LIMIT));
     }
 }

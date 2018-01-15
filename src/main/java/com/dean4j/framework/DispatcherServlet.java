@@ -4,9 +4,7 @@ import com.dean4j.framework.bean.Data;
 import com.dean4j.framework.bean.Handler;
 import com.dean4j.framework.bean.Param;
 import com.dean4j.framework.bean.View;
-import com.dean4j.framework.helper.BeanHelper;
-import com.dean4j.framework.helper.ConfigHelper;
-import com.dean4j.framework.helper.ControllerHelper;
+import com.dean4j.framework.helper.*;
 import com.dean4j.framework.uitl.*;
 
 import javax.servlet.ServletConfig;
@@ -53,6 +51,11 @@ public class DispatcherServlet extends HttpServlet {
          */
         ServletRegistration defaultServlet = servletContext.getServletRegistration("default");
         defaultServlet.addMapping(ConfigHelper.getAppAssetPath() + "*");
+
+        /**
+         * 初始化附件上传
+         */
+        UploadHelper.init(servletContext);
     }
 
     @Override
@@ -62,6 +65,10 @@ public class DispatcherServlet extends HttpServlet {
          */
         String requestMethod = req.getMethod().toLowerCase();
         String requestPath = req.getPathInfo();
+
+        if (requestPath.equals("/favicon.ico")) {
+            return;
+        }
 
         /**
          * 获取Action处理器
@@ -77,69 +84,71 @@ public class DispatcherServlet extends HttpServlet {
             /**
              * 创建请求参数对象
              */
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            Enumeration<String> paramNames = req.getParameterNames();
-            while (paramNames.hasMoreElements()) {
-                String paramName = paramNames.nextElement();
-                String paramValue = req.getParameter(paramName);
-                paramMap.put(paramName, paramValue);
+            Param param;
+            if (UploadHelper.isMultiPart(req))
+            {
+                param = UploadHelper.createParam(req);
             }
-            String body = CodecUtil.decodeURL(StreamUtil.getString(req.getInputStream()));
-            if (StringUtil.isNotEmpty(body)) {
-                String[] params = body.split("&");
-                if (ArrayUtil.isNotEmpty(params)) {
-                    for (String param : params) {
-                        String[] array = param.split("=");
-                        if (ArrayUtil.isNotEmpty(array) && array.length == 2) {
-                            String paramName = array[0];
-                            String paramValue = array[1];
-                            paramMap.put(paramName, paramValue);
-                        }
-                    }
-                }
+            else
+            {
+                param = RequestHelper.createParam(req);
             }
-            Param param = new Param(paramMap);
             /**
              * 调用Action的方法
              */
             Method actionMethod = handler.getActionMethod();
-            Object result = ReflectionUtil.invokeMethod(controllerBean, actionMethod, param);
+            Object result = null;
+            /**
+             * 判断是否存在参数
+             */
+            if (param.isEmpty()) {
+                result = ReflectionUtil.invokeMethod(controllerBean, actionMethod);
+            } else {
+                result = ReflectionUtil.invokeMethod(controllerBean, actionMethod, param);
+            }
 
             /**
              * 处理Action的返回值
              */
             if (result instanceof View) {
-                //返回jsp页面
-                View view = (View) result;
-                String path = view.getPath();
-                if (StringUtil.isNotEmpty(path)) {
-                    if (path.startsWith("/")) {
-                        /**
-                         * 跳转到其他的 Action
-                         */
-                        resp.sendRedirect(req.getContextPath() + path);
-                    } else {
-                        Map<String, Object> model = view.getModel();
-                        for (Map.Entry<String, Object> entry : model.entrySet()) {
-                            req.setAttribute(entry.getKey(), entry.getValue());
-                        }
-                        req.getRequestDispatcher(ConfigHelper.getAppJspPath() + path).forward(req, resp);
-                    }
-                }
+                handleViewResult(req, resp, (View) result);
             } else if (result instanceof Data) {
-                //返回Json数据
-                Data data = (Data) result;
-                Object model = data.getModel();
-                if (model != null) {
-                    resp.setContentType("application/json");
-                    PrintWriter writer = resp.getWriter();
-                    String json = JsonUtil.toJson(model);
-                    writer.write(json);
-                    writer.flush();
-                    writer.close();
-                }
+                handlerDataResult(resp, (Data) result);
             }
+        }
+    }
 
+    private void handlerDataResult(HttpServletResponse resp, Data result) throws IOException {
+        //返回Json数据
+        Data data = result;
+        Object model = data.getModel();
+        if (model != null) {
+            resp.setContentType("application/json");
+            PrintWriter writer = resp.getWriter();
+            String json = JsonUtil.toJson(model);
+            writer.write(json);
+            writer.flush();
+            writer.close();
+        }
+    }
+
+    private void handleViewResult(HttpServletRequest req, HttpServletResponse resp, View result) throws IOException, ServletException {
+        //返回jsp页面
+        View view = result;
+        String path = view.getPath();
+        if (StringUtil.isNotEmpty(path)) {
+            if (path.startsWith("/")) {
+                /**
+                 * 跳转到其他的 Action
+                 */
+                resp.sendRedirect(req.getContextPath() + path);
+            } else {
+                Map<String, Object> model = view.getModel();
+                for (Map.Entry<String, Object> entry : model.entrySet()) {
+                    req.setAttribute(entry.getKey(), entry.getValue());
+                }
+                req.getRequestDispatcher(ConfigHelper.getAppJspPath() + path).forward(req, resp);
+            }
         }
     }
 }

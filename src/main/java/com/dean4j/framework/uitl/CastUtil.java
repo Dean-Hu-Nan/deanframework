@@ -75,7 +75,7 @@ public final class CastUtil {
     /**
      * 转为int型
      */
-    public static long castInt(Object obj) {
+    public static int castInt(Object obj) {
         return CastUtil.castInt(obj, 0);
     }
 
