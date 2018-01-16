@@ -36,7 +36,7 @@ public class FirstDemoController {
      */
     @Action("get:/data")
     public Data data(Param param) {
-        return new Data(new DataDemo(CastUtil.castInt(param.getFileMap().get("id")), "Dean"));
+        return new Data(new DataDemo(CastUtil.castInt(param.getFiledMap().get("id")), "Dean"));
     }
 
 

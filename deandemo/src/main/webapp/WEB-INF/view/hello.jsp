@@ -12,5 +12,8 @@
     <input name="demo_file" type="file"/>
     <input type="submit" value="测试上传">
 </form>
+<br/>
+<br/>
+<b>框架源码下载地址：</b> <a href="https://github.com/Dean-Hu-Nan/deanframework">GitHub</a>
 </body>
 </html>

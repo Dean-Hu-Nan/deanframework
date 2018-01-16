@@ -30,7 +30,7 @@ public class FirstDemoServiceImpl implements FirstDemoService {
 
     @Override
     public Boolean uploadFiles(Param param) {
-        UploadHelper.uploadFile("/tem/upload", param.getFile("demo_file"));
+        UploadHelper.uploadFile("/tem/upload/", param.getFile("demo_file"));
         return true;
     }
 }
